@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using API.Models;
+using DLL.Model;
+using DLL.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
@@ -11,76 +12,41 @@ namespace API.Controllers
     
     public class DepartmentController : MainApiController
     {
-        [HttpGet]
-        public IActionResult GetAll()
+        private readonly IDepartmentRepository _departmentRepository;
+
+        public DepartmentController(IDepartmentRepository departmentRepository)
         {
-            return Ok(DepartmentStatic.GetAllDepartments());
+            _departmentRepository = departmentRepository;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll()
+        {
+            return Ok(await _departmentRepository.GetAllAsync());
         }
 
         [HttpGet(template: "{code}")]
-        public IActionResult GetA(string code)
+        public async Task<IActionResult> GetA(string code)
         {
-            return Ok(DepartmentStatic.GetADepartment(code));
+            return Ok(await _departmentRepository.GetAAsync(code));
         }
 
         [HttpPost]
-        public IActionResult Insert(Department department)
+        public async Task<IActionResult> Insert(Department department)
         {
-            return Ok(DepartmentStatic.InsertDepartment(department));
+            return Ok(await _departmentRepository.InsertAsync(department));
         }
 
         [HttpPut("{code}")]
-        public IActionResult Update(string code, Department department)
+        public async Task<IActionResult> Update(string code, Department department)
         {
-            return Ok(DepartmentStatic.UpdateDepartment(code, department));
+            return Ok(await _departmentRepository.UpdateAsync(code,department));
         }
 
         [HttpDelete]
-        public IActionResult Delete(string code)
+        public async Task<IActionResult> Delete(string code)
         {
-            return Ok(DepartmentStatic.DeleteDepartment(code));
-        }
-    }
-    public static class DepartmentStatic
-    {
-        public static List<Department> AllDepartments { get; set; } = new List<Department>();
-
-        public static Department InsertDepartment(Department department)
-        {
-            AllDepartments.Add(department);
-            return department;
-        }
-
-        public static List<Department> GetAllDepartments()
-        {
-            return AllDepartments;
-        }
-
-        public static Department GetADepartment(string code)
-        {
-            return AllDepartments.FirstOrDefault(x => x.Code == code);
-        }
-
-        public static Department UpdateDepartment(string code, Department department)
-        {
-            Department result = new Department();
-            foreach (var aDepartment in AllDepartments)
-            {
-                if(code == aDepartment.Code)
-                {
-                    aDepartment.Name = department.Name;
-                    result = aDepartment;
-                }
-            }
-
-            return result;
-        }
-
-        public static Department DeleteDepartment(string code)
-        {
-            var department = AllDepartments.FirstOrDefault(x => x.Code == code);
-            AllDepartments = AllDepartments.Where(x => x.Code != department.Code).ToList();
-            return department;
+            return Ok(await _departmentRepository.DeleteAsync(code));
         }
     }
 }
