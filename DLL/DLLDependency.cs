@@ -16,6 +16,7 @@ namespace DLL
                 options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
 
             services.AddTransient<IDepartmentRepository, DepartmentRepository>();
+            services.AddTransient<IStudentRepository, StudentRepository>();
         }
     }
 }
